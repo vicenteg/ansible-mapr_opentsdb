@@ -1,0 +1,58 @@
+---
+# tasks file for mapr-opentsdb
+
+- name: install wget
+  yum: name=wget state=present
+
+- name: install mapr-hbase
+  yum: name=mapr-hbase state=present
+
+- name: install mapr-asynchbase
+  yum: name=mapr-asynchbase state=present
+
+- name: install opentsdb
+  yum: name=https://github.com/OpenTSDB/opentsdb/releases/download/v2.1.0RC1/opentsdb-2.1.0RC1.noarch.rpm state=present
+
+- name: get zookeeper ensemble
+  command: maprcli node listzookeepers -noheader
+  register: zookeeper
+
+- name: install new opentsdb.conf
+  template: src=opentsdb.conf.j2 dest=/usr/share/opentsdb/etc/opentsdb/opentsdb.conf backup=true mode=0644
+  notify: restart opentsdb
+
+- name: get MapR installation helpers
+  #git: repo=https://github.com/adeneche/opentsdb-maprdb-install.git dest=/tmp/opentsdb-maprdb-install
+  git: repo=https://github.com/vicenteg/opentsdb-maprdb-install.git dest=/tmp/opentsdb-maprdb-install
+  environment:
+    http_proxy: http://172.16.1.58:3128
+
+- name: install missing jars
+  command: /tmp/opentsdb-maprdb-install/install.sh
+  environment:
+    HADOOP_HOME: /opt/mapr/hadoop/hadoop-{{hadoop_version}}
+    HBASE_HOME: /opt/mapr/hbase/hbase-{{hbase_version}}
+    OPENTSDB_HOME: /usr/share/opentsdb
+    http_proxy: http://172.16.1.58:3128
+  notify: restart opentsdb
+
+- name: create tables
+  command: /tmp/opentsdb-maprdb-install/create_table.sh
+  environment:
+    COMPRESSION: NONE
+    HBASE_HOME: /opt/mapr/hbase/hbase-{{hbase_version}}
+    TSDB_TABLE: /user/mapr/tables/tsdb
+    UID_TABLE: /user/mapr/tables/tsdb-uid
+    TREE_TABLE: /user/mapr/tables/tsdb-tree
+    META_TABLE: /user/mapr/tables/tsdb-meta
+  notify: restart opentsdb
+
+- name: download forked tcollector
+  get_url: url=https://codeload.github.com/vicenteg/tcollector/zip/master dest=/tmp
+  
+- name: unpack tcollector to /opt
+  command: chdir=/opt unzip /tmp/tcollector-master.zip
+
+- name: enable opentsdb
+  service: name=opentsdb state=started enabled=yes
+
