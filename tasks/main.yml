@@ -14,7 +14,7 @@
   yum: name=mapr-asynchbase state=present
 
 - name: install opentsdb
-  yum: name=https://github.com/OpenTSDB/opentsdb/releases/download/v2.0.1/opentsdb-2.0.1.noarch.rpm state=present
+  yum: name=https://github.com/OpenTSDB/opentsdb/releases/download/v2.1.0RC1/opentsdb-2.1.0RC1.noarch.rpm state=present
 
 - name: get zookeeper ensemble
   command: maprcli node listzookeepers -noheader
