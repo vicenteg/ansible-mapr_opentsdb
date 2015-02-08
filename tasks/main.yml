@@ -42,6 +42,9 @@
     - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/json-20080701.jar
   notify: restart opentsdb
 
+- name: get install helpers
+  git: repo=https://github.com/mapr-demos/opentsdb-maprdb-install.git dest=/tmp/opentsdb-maprdb-install
+
 - name: create tables
   command: /tmp/opentsdb-maprdb-install/create_table.sh
   environment:
@@ -52,15 +55,6 @@
     TREE_TABLE: /user/mapr/tsdb-tree
     META_TABLE: /user/mapr/tsdb-meta
   notify: restart opentsdb
-
-- name: download forked tcollector
-  get_url: url=https://codeload.github.com/vicenteg/tcollector/zip/master dest=/tmp/tcollector-master.zip
-  environment:
-    http_proxy: http://172.16.1.58:3128
-    https_proxy: http://172.16.1.58:3128
-  
-- name: unpack tcollector to /opt
-  command: chdir=/opt unzip -o /tmp/tcollector-master.zip
 
 - name: enable opentsdb
   service: name=opentsdb state=started enabled=yes
