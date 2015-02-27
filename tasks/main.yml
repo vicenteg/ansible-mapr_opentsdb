@@ -3,18 +3,23 @@
 
 - name: install wget
   yum: name=wget state=present
+  environment: proxy_env
 
 - name: install git
   yum: name=git state=present
+  environment: proxy_env
 
 - name: install mapr-hbase
   yum: name=mapr-hbase state=present
+  environment: proxy_env
 
 - name: install mapr-asynchbase
   yum: name=mapr-asynchbase state=present
+  environment: proxy_env
 
 - name: install opentsdb
   yum: name=https://github.com/OpenTSDB/opentsdb/releases/download/v2.1.0RC1/opentsdb-2.1.0RC1.noarch.rpm state=present
+  environment: proxy_env
 
 - name: get zookeeper ensemble
   command: maprcli node listzookeepers -noheader
@@ -44,6 +49,7 @@
 
 - name: get install helpers
   git: repo=https://github.com/mapr-demos/opentsdb-maprdb-install.git dest=/tmp/opentsdb-maprdb-install
+  environment: proxy_env
 
 - name: create tables
   command: /tmp/opentsdb-maprdb-install/create_table.sh
