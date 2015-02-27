@@ -62,6 +62,9 @@
     META_TABLE: /user/mapr/tsdb-meta
   notify: restart opentsdb
 
+- name: create mapr metrics
+  command: tsdb mkmetric mapr.disks.READBYTES mapr.disks.WRITEOPS mapr.disks.WRITEBYTES mapr.disks.READOPS mapr.cpus.CPUTOTAL mapr.cpus.CPUIDLE mapr.cpus.CPUIOWAIT mapr.network.PKTSOUT mapr.network.BYTESOUT mapr.network.PKTSIN mapr.network.BYTESIN mapr.memory.used mapr.mfs.available mapr.mfs.used mapr.rpc.count mapr.rpc.inbytes mapr.rpc.outbytes
+
 - name: enable opentsdb
   service: name=opentsdb state=started enabled=yes
 
