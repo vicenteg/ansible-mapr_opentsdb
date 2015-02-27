@@ -28,9 +28,9 @@ Example Playbook
 License
 -------
 
-BSD
+MIT
 
 Author Information
 ------------------
 
-vgonzalez at mapr dawt com
+Vince Gonzalez
