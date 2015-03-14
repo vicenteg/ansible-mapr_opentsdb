@@ -1,5 +1,7 @@
 ---
 # defaults file for mapr-opentsdb
 
+proxy_env: { }
+
 hbase_version: 0.98.7
 hadoop_version: 0.20.2
