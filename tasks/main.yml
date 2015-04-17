@@ -14,7 +14,7 @@
   environment: proxy_env
 
 - name: install mapr-asynchbase
-  yum: name=mapr-asynchbase state=present
+  yum: name=mapr-asynchbase-{{asynchbase_version}} state=present
   environment: proxy_env
 
 - name: install opentsdb
