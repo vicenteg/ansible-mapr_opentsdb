@@ -1,6 +1,9 @@
 ---
 # tasks file for mapr-opentsdb
 
+- name: create opentsdb user
+  user: name={{opentsdb_user}} 
+
 - name: install wget
   yum: name=wget state=present
   environment: proxy_env
@@ -13,9 +16,15 @@
   yum: name=mapr-hbase state=present
   environment: proxy_env
 
-- name: install mapr-asynchbase
-  yum: name=mapr-asynchbase-{{asynchbase_version}} state=present
+- name: install mapr-asynchbase 1.5
+  yum: name=mapr-asynchbase-1.5* state=present
   environment: proxy_env
+  when: "'v4.0' in mapr_version"
+
+- name: install mapr-asynchbase 1.6
+  yum: name=mapr-asynchbase-1.6* state=present
+  environment: proxy_env
+  when: "'v4.1' in mapr_version"
 
 - name: install opentsdb
   yum: name=https://github.com/OpenTSDB/opentsdb/releases/download/v2.1.0RC1/opentsdb-2.1.0RC1.noarch.rpm state=present
@@ -25,11 +34,23 @@
   command: maprcli node listzookeepers -noheader
   register: zookeeper
 
+- name: update opentsdb user in init script
+  lineinfile: regexp=^USER= line="USER={{opentsdb_user}}" dest=/usr/share/opentsdb/etc/init.d/opentsdb
+
+- name: change ownership of logs directory
+  file: path=/var/log/opentsdb state=directory owner={{opentsdb_user}}
+
+- name: make opentsdb tables home
+  command: hadoop fs -mkdir -p {{opentsdb_tables_home}}
+
+- name: make opentsdb data directory
+  command: hadoop fs -chown -R {{opentsdb_user}} {{opentsdb_tables_home}}
+
 - name: install new opentsdb.conf
   template: src=opentsdb.conf.j2 dest=/usr/share/opentsdb/etc/opentsdb/opentsdb.conf backup=true mode=0644
   notify: restart opentsdb
 
-- name: copy MapR jars
+- name: copy MapR jars (MapR v4.0.x, asynchbase 1.5)
   command: cp {{item}} /usr/share/opentsdb/lib
   with_items:
     - /opt/mapr/asynchbase/asynchbase-1.5.0/asynchbase-1.5.0-mapr-1501.jar
@@ -40,29 +61,48 @@
     - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/commons-collections-3.2.1.jar
     - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/maprfs-core-4.0.2-mapr.jar
     - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/mapr-hbase-4.0.2-mapr.jar
-    - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/mapr-hbase-4.0.2-mapr.jar
     - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/hadoop-auth-2.5.1-mapr-1501.jar
     - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/commons-configuration-1.6.jar
     - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/commons-lang-2.6.jar
     - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/json-20080701.jar
   notify: restart opentsdb
+  when: "'v4.0' in mapr_version"
+
+- name: copy MapR jars (MapR v4.1.x, asynchbase 1.6)
+  command: cp {{item}} /usr/share/opentsdb/lib
+  with_items:
+    - /opt/mapr/asynchbase/asynchbase-1.6.0/asynchbase-1.6.0-mapr-1504.jar
+    - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/hadoop-common-2.5.1-mapr-1503.jar
+    - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/commons-logging-1.1.3.jar
+    - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/commons-collections-3.2.1.jar
+    - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/hadoop-auth-2.5.1-mapr-1503.jar
+    - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/commons-configuration-1.6.jar
+    - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/commons-lang-2.6.jar
+    - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/json-20080701.jar
+    - /opt/mapr/lib/maprfs-core-4.1.0-mapr.jar
+    - /opt/mapr/lib/mapr-hbase-4.1.0-mapr.jar
+    - /opt/mapr/lib/maprfs-4.1.0-mapr.jar
+    - /opt/mapr/lib/maprfs-core-4.1.0-mapr.jar
+  notify: restart opentsdb
+  when: "'v4.1' in mapr_version"
+
+- name: remove non-mapr asynchbase
+  file: path=/usr/share/opentsdb/lib/asynchbase-1.6.0.jar state=absent 
 
 - name: get install helpers
   git: repo=https://github.com/mapr-demos/opentsdb-maprdb-install.git dest=/tmp/opentsdb-maprdb-install
   environment: proxy_env
 
+- name: update create table script with tables home
+  lineinfile: regexp=^TABLES_PATH line=TABLES_PATH="{{opentsdb_tables_home}}" dest=/tmp/opentsdb-maprdb-install/create_table.sh
+
 - name: create tables
+  sudo_user: '{{opentsdb_user}}'
   command: /tmp/opentsdb-maprdb-install/create_table.sh
-  environment:
-    COMPRESSION: NONE
-    HBASE_HOME: /opt/mapr/hbase/hbase-{{hbase_version}}
-    TSDB_TABLE: /user/mapr/tsdb
-    UID_TABLE: /user/mapr/tsdb-uid
-    TREE_TABLE: /user/mapr/tsdb-tree
-    META_TABLE: /user/mapr/tsdb-meta
   notify: restart opentsdb
 
 - name: create mapr metrics
+  sudo_user: '{{opentsdb_user}}'
   command: tsdb mkmetric mapr.disks.READBYTES mapr.disks.WRITEOPS mapr.disks.WRITEBYTES mapr.disks.READOPS mapr.cpus.CPUTOTAL mapr.cpus.CPUIDLE mapr.cpus.CPUIOWAIT mapr.network.PKTSOUT mapr.network.BYTESOUT mapr.network.PKTSIN mapr.network.BYTESIN mapr.memory.used mapr.mfs.available mapr.mfs.used mapr.rpc.count mapr.rpc.inbytes mapr.rpc.outbytes
 
 - name: enable opentsdb

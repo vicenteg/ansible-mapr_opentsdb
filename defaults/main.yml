@@ -9,4 +9,7 @@ hadoop_version: 0.20.2
 # be sure asynchbase version matches your MapR release
 # 1.5 for v4.0.x
 # 1.6 for v4.1.x
-asynchbase_version: 1.5.0.29714 
+asynchbase_version: 1.6.0*
+
+opentsdb_user: opentsdb
+opentsdb_tables_home: /apps/opentsdb
