@@ -90,7 +90,7 @@
   file: path=/usr/share/opentsdb/lib/asynchbase-1.6.0.jar state=absent 
 
 - name: get install helpers
-  git: repo=https://github.com/mapr-demos/opentsdb-maprdb-install.git dest=/tmp/opentsdb-maprdb-install
+  git: repo=https://github.com/mapr-demos/opentsdb-maprdb-install.git dest=/tmp/opentsdb-maprdb-install force=yes
   environment: proxy_env
 
 - name: update create table script with tables home
