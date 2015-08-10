@@ -13,6 +13,5 @@ galaxy_info:
     - name: Amazon
       versions:
 dependencies: 
-  - { role: user_account, user: "{{opentsdb_user}}", uid: 2147483631, group: "{{opentsdb_user}}", gid: 2147483631, home: /home/opentsdb }
   - { role: mapr_maprlogin_service, mapr_admin_username: mapr, maprlogin_username: "{{opentsdb_user}}" }
   
