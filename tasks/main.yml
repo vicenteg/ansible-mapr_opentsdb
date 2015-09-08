@@ -48,6 +48,7 @@
   sudo_user: "{{mapr_admin_username}}"
   command: maprcli node listzookeepers -noheader
   register: zookeeper
+  changed_when: false
 
 - name: update opentsdb user in init script
   sudo: yes
