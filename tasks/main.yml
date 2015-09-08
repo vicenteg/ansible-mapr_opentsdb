@@ -2,31 +2,45 @@
 # tasks file for mapr-opentsdb
 
 - name: create opentsdb user
+  sudo: yes
+  sudo_user: root
   user: name={{opentsdb_user}} 
 
 - name: install wget
+  sudo: yes
+  sudo_user: root
   yum: name=wget state=present
   environment: proxy_env
 
 - name: install git
+  sudo: yes
+  sudo_user: root
   yum: name=git state=present
   environment: proxy_env
 
 - name: install mapr-hbase
+  sudo: yes
+  sudo_user: root
   yum: name=mapr-hbase-{{hbase_version}}.{{hbase_build}} state=present
   environment: proxy_env
 
 - name: install mapr-asynchbase 1.5
+  sudo: yes
+  sudo_user: root
   yum: name=mapr-asynchbase-1.5* state=present
   environment: proxy_env
   when: "'v4.0' in mapr_version"
 
 - name: install mapr-asynchbase 1.6
+  sudo: yes
+  sudo_user: root
   yum: name=mapr-asynchbase-1.6* state=present
   environment: proxy_env
   when: "'v4.1' in mapr_version or 'v5.0' in mapr_version"
 
 - name: install opentsdb
+  sudo: yes
+  sudo_user: root
   yum: name=https://github.com/OpenTSDB/opentsdb/releases/download/v2.1.0RC1/opentsdb-2.1.0RC1.noarch.rpm state=present
   environment: proxy_env
 
@@ -36,9 +50,13 @@
   register: zookeeper
 
 - name: update opentsdb user in init script
+  sudo: yes
+  sudo_user: root
   lineinfile: regexp=^USER= line="USER={{opentsdb_user}}" dest=/usr/share/opentsdb/etc/init.d/opentsdb
 
 - name: change ownership of logs directory
+  sudo: yes
+  sudo_user: root
   file: path=/var/log/opentsdb state=directory owner={{opentsdb_user}}
 
 - name: make opentsdb tables home
@@ -50,10 +68,14 @@
   command: hadoop fs -chown -R {{opentsdb_user}} {{opentsdb_tables_home}}
 
 - name: install new opentsdb.conf
+  sudo: yes
+  sudo_user: root
   template: src=opentsdb.conf.j2 dest=/usr/share/opentsdb/etc/opentsdb/opentsdb.conf backup=true mode=0644
   notify: restart opentsdb
 
 - name: copy MapR jars (MapR v4.0.x, asynchbase 1.5)
+  sudo: yes
+  sudo_user: root
   command: cp {{item}} /usr/share/opentsdb/lib
   with_items:
     - /opt/mapr/asynchbase/asynchbase-1.5.0/asynchbase-1.5.0-mapr-1501.jar
@@ -72,6 +94,8 @@
   when: "'v4.0' in mapr_version"
 
 - name: copy MapR jars (MapR v4.1.x, asynchbase 1.6)
+  sudo: yes
+  sudo_user: root
   command: cp {{item}} /usr/share/opentsdb/lib
   with_items:
     - /opt/mapr/asynchbase/asynchbase-1.6.0/asynchbase-1.6.0-mapr-1504.jar
@@ -90,6 +114,8 @@
   when: "'v4.1' in mapr_version"
 
 - name: copy MapR jars (MapR v5.0.x, asynchbase 1.6)
+  sudo: yes
+  sudo_user: root
   command: cp {{item}} /usr/share/opentsdb/lib
   with_items:
     - /opt/mapr/asynchbase/asynchbase-1.6.0/asynchbase-1.6.0-mapr-1504.jar
@@ -108,6 +134,8 @@
   when: "'v5.0' in mapr_version"
 
 - name: remove non-mapr asynchbase
+  sudo: yes
+  sudo_user: root
   file: path=/usr/share/opentsdb/lib/asynchbase-1.6.0.jar state=absent 
 
 - name: get install helpers
@@ -115,6 +143,8 @@
   environment: proxy_env
 
 - name: update create table script with tables home
+  sudo: yes
+  sudo_user: root
   lineinfile: regexp=^TABLES_PATH line=TABLES_PATH="{{opentsdb_tables_home}}" dest=/tmp/opentsdb-maprdb-install/create_table.sh
 
 - name: create tables
@@ -127,5 +157,7 @@
   command: tsdb mkmetric mapr.disks.READBYTES mapr.disks.WRITEOPS mapr.disks.WRITEBYTES mapr.disks.READOPS mapr.cpus.CPUTOTAL mapr.cpus.CPUIDLE mapr.cpus.CPUIOWAIT mapr.network.PKTSOUT mapr.network.BYTESOUT mapr.network.PKTSIN mapr.network.BYTESIN mapr.memory.used mapr.mfs.available mapr.mfs.used mapr.rpc.count mapr.rpc.inbytes mapr.rpc.outbytes
 
 - name: enable opentsdb
+  sudo: yes
+  sudo_user: root
   service: name=opentsdb state=started enabled=yes
 
