@@ -164,4 +164,4 @@
 
 - name: install warden configuration
   sudo_user: '{{mapr_admin_username}}'
-  file: src=warden.opentsdb.conf dest=/opt/mapr/conf/conf.d/warden.opentsdb.conf mode=644
+  copy: src=warden.opentsdb.conf dest=/opt/mapr/conf/conf.d/warden.opentsdb.conf mode=644
