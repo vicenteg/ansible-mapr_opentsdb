@@ -3,8 +3,8 @@
 
 proxy_env: { }
 
-hbase_version: 0.98.7
-hbase_build: 201501291259-1
+hbase_version: 0.98.12
+hbase_build: 201507081709-1
 hadoop_version: 0.20.2
 
 # be sure asynchbase version matches your MapR release
