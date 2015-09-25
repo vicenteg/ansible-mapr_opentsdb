@@ -21,7 +21,7 @@
 - name: install mapr-hbase
   sudo: yes
   sudo_user: root
-  yum: name=mapr-hbase-{{hbase_version}}.{{hbase_build}} state=present
+  yum: name=mapr-hbase-{{hbase[mapr_version]["hbase_version"]}}.{{hbase[mapr_version]["hbase_build"]}} state=present
   environment: proxy_env
 
 - name: install mapr-asynchbase 1.5
