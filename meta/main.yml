@@ -13,5 +13,5 @@ galaxy_info:
     - name: Amazon
       versions:
 dependencies: 
-  - { role: mapr_maprlogin_service, mapr_admin_username: mapr, maprlogin_username: "{{opentsdb_user}}", when: secure_cluster is defined and secure_cluster == "True" }
+  - { role: mapr_maprlogin_service, mapr_admin_username: mapr, maprlogin_username: "{{opentsdb_user}}", when: secure_cluster is defined and secure_cluster == True }
   
