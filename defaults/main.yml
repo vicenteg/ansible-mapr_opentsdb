@@ -6,7 +6,7 @@ proxy_env: { }
 hbase:
   v5.1.0:
     hbase_version: 0.98.12
-    hbase_build: 201507081709-1
+    hbase_build: 201603011130-1
     hadoop_version: 0.20.2
   v5.0.0:
     hbase_version: 0.98.12
