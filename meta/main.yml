@@ -12,6 +12,4 @@ galaxy_info:
       - 7
     - name: Amazon
       versions:
-dependencies: 
-  - { role: vicenteg.mapr_maprlogin_service, mapr_admin_username: mapr, maprlogin_username: "{{opentsdb_user}}", when: secure_cluster is defined and secure_cluster == True }
-  
+dependencies:  []
