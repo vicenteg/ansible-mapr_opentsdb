@@ -34,14 +34,14 @@
 - name: install mapr-asynchbase 1.6
   sudo: yes
   sudo_user: root
-  yum: name=mapr-asynchbase-1.6* state=present
+  yum: name=mapr-asynchbase-1.7* state=present
   environment: proxy_env
   when: "'v4.1' in mapr_version or 'v5' in mapr_version"
 
 - name: install opentsdb
   sudo: yes
   sudo_user: root
-  yum: name=https://github.com/OpenTSDB/opentsdb/releases/download/v2.1.0RC1/opentsdb-2.1.0RC1.noarch.rpm state=present
+  yum: name=https://github.com/OpenTSDB/opentsdb/releases/download/v2.2.0/opentsdb-2.2.0.noarch.rpm state=present
   environment: proxy_env
 
 - name: get zookeeper ensemble
@@ -94,12 +94,12 @@
   notify: restart opentsdb
   when: "'v4.0' in mapr_version"
 
-- name: copy MapR jars (MapR v4.1.x, asynchbase 1.6)
+- name: copy MapR jars (MapR v4.1.x, asynchbase 1.7)
   sudo: yes
   sudo_user: root
   command: cp {{item}} /usr/share/opentsdb/lib
   with_items:
-    - /opt/mapr/asynchbase/asynchbase-1.6.0/asynchbase-1.6.0-mapr-1504.jar
+    - /opt/mapr/asynchbase/asynchbase-1.7.0/asynchbase-1.7.0-mapr-1603.jar
     - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/hadoop-common-2.5.1-mapr-1503.jar
     - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/commons-logging-1.1.3.jar
     - /opt/mapr/hadoop/hadoop-2.5.1/share/hadoop/common/lib/commons-collections-3.2.1.jar
@@ -119,7 +119,7 @@
   sudo_user: root
   command: cp {{item}} /usr/share/opentsdb/lib
   with_items:
-    - /opt/mapr/asynchbase/asynchbase-1.6.0/asynchbase-1.6.0-mapr-1504.jar
+    - /opt/mapr/asynchbase/asynchbase-1.7.0/asynchbase-1.7.0-mapr-1603.jar
     - /opt/mapr/hadoop/hadoop-2.7.0/share/hadoop/common/hadoop-common-2.7.0-mapr-1602.jar
     - /opt/mapr/hadoop/hadoop-2.7.0/share/hadoop/common/lib/commons-logging-1.1.3.jar
     - /opt/mapr/hadoop/hadoop-2.7.0/share/hadoop/common/lib/commons-collections-3.2.2.jar
