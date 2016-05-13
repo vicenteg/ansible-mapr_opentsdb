@@ -1,0 +1,14 @@
+[Unit]
+Description=OpenTSDB Service
+After=network.target mapr-warden.service
+ 
+[Service]
+Type=forking
+PrivateTmp=yes
+ExecStart=/usr/share/opentsdb/etc/init.d/opentsdb start
+ExecStop=/usr/share/opentsdb/etc/init.d/opentsdb stop
+Restart=on-abort
+ 
+[Install]
+WantedBy=multi-user.target
+

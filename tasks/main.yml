@@ -55,6 +55,12 @@
   sudo_user: root
   lineinfile: regexp=^USER= line="USER={{opentsdb_user}}" dest=/usr/share/opentsdb/etc/init.d/opentsdb
 
+- name: install opentsdb systemctl service
+  become: yes
+  become_user: root
+  copy: src=opentsdb.service dest=/usr/lib/systemd/system/opentsdb.service owner=root group=root mode=0644
+  when: ansible_distribution_major_version == "7"
+
 - name: change ownership of logs directory
   sudo: yes
   sudo_user: root
