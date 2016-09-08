@@ -10,39 +10,33 @@
   become: yes
   become_user: root
   yum: name=wget state=present
-  environment: '{{proxy_env}}'
 
 - name: install git
   become: yes
   become_user: root
   yum: name=git state=present
-  environment: '{{proxy_env}}'
 
 - name: install mapr-hbase
   become: yes
   become_user: root
   yum: name=mapr-hbase-{{hbase[mapr_version]["hbase_version"]}}.{{hbase[mapr_version]["hbase_build"]}} state=present
-  environment: '{{proxy_env}}'
 
 - name: install mapr-asynchbase 1.5
   become: yes
   become_user: root
   yum: name=mapr-asynchbase-1.5* state=present
-  environment: '{{proxy_env}}'
   when: "'v4.0' in mapr_version"
 
 - name: install mapr-asynchbase 1.7
   become: yes
   become_user: root
   yum: name=mapr-asynchbase-1.7* state=present
-  environment: '{{proxy_env}}'
   when: "'v4.1' in mapr_version or 'v5' in mapr_version"
 
 - name: install opentsdb
   become: yes
   become_user: root
   yum: name=https://github.com/OpenTSDB/opentsdb/releases/download/v2.2.0/opentsdb-2.2.0.noarch.rpm state=present
-  environment: '{{proxy_env}}'
 
 - name: get zookeeper ensemble
   become: yes
@@ -143,7 +137,6 @@
 
 - name: get install helpers
   git: repo=https://github.com/mapr-demos/opentsdb-maprdb-install.git dest=/tmp/opentsdb-maprdb-install force=yes
-  environment: '{{proxy_env}}'
 
 - name: update create table script with tables home
   become: yes
